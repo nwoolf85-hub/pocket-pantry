@@ -266,6 +266,34 @@ button{cursor:pointer; border:none; background:none}
 .mc-cal{font-variant-numeric:tabular-nums; color:var(--cream); font-weight:700; min-width:34px; text-align:right}
 .mc-del{color:var(--faint); padding:4px 2px 4px 6px; font-size:13px}
 
+/* shopping list */
+.storegroup{background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  padding:6px 4px 8px; margin-top:12px; overflow:hidden}
+.storegroup.alldone{border-color:rgba(79,178,134,.45)}
+.store-head{display:flex; justify-content:space-between; align-items:center; padding:8px 12px 6px;
+  font-weight:800; font-size:13px; text-transform:uppercase; letter-spacing:.8px; color:var(--cream)}
+.store-prog{font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; letter-spacing:0}
+.storegroup.alldone .store-prog{color:var(--good)}
+.store-done{margin:0 8px 6px; padding:8px 10px; border-radius:10px; font-size:13px; font-weight:700;
+  color:var(--good); background:rgba(79,178,134,.14)}
+.shopitem{display:flex; align-items:center; gap:12px; padding:11px 12px; margin:0 6px 6px;
+  background:var(--navy2); border:1px solid var(--line); border-radius:11px; cursor:pointer}
+.shopitem input{width:22px; height:22px; flex:0 0 auto; accent-color:var(--good); cursor:pointer}
+.shopitem .si-name{flex:1; font-weight:600; font-size:15px}
+.shopitem.done .si-name{color:var(--faint); text-decoration:line-through}
+.si-badge{font-size:10px; font-weight:700; color:var(--faint); background:var(--panel);
+  border:1px solid var(--line); padding:2px 7px; border-radius:6px; text-transform:uppercase; letter-spacing:.4px}
+
+/* ideas / pairings */
+.idea-card{background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  padding:13px 15px; margin-top:12px}
+.idea-head{font-weight:800; font-size:15px; color:var(--cream); margin-bottom:8px}
+.idea-list{list-style:none; margin:0; padding:0}
+.idea-list li{position:relative; padding:6px 0 6px 18px; font-size:14px; color:var(--dim);
+  border-top:1px solid var(--line)}
+.idea-list li:first-child{border-top:none}
+.idea-list li::before{content:"›"; position:absolute; left:2px; color:var(--gold); font-weight:800}
+
 .toast{position:fixed; left:50%; bottom:calc(var(--tabh) + 14px); transform:translateX(-50%);
   z-index:80; background:var(--panel2); border:1px solid var(--line2); color:var(--cream);
   padding:11px 18px; border-radius:999px; font-weight:600; font-size:14px;

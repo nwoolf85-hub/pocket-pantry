@@ -2,7 +2,7 @@
    Food lookups via Open Food Facts (no key). */
 'use strict';
 
-const VERSION = 'v1.2.0';
+const VERSION = 'v1.3.0';
 const LS = 'dietdash.v1';
 
 /* ---------- nutrient model ----------
@@ -28,12 +28,14 @@ const defaultState = () => ({
   targets: Object.fromEntries(NUTRIENTS.map(n=>[n.key,n.dflt])),
   window: { start: 12, len: 8 },   // 8-hour window starting noon
   usdaKey: 'DEMO_KEY',             // free key from fdc.nal.usda.gov/api-key-signup
+  shop: { trip: [], checked: {} }, // shopping trip: meal ids + checked items
 });
 
 let state = load();
 let viewDate = startOfDay(new Date());   // which day the Today view shows
 let currentTab = 'today';
 let pantryMode = 'foods';                // 'foods' | 'meals' (Pantry tab toggle)
+let shopMode = 'list';                   // 'list' | 'ideas' (Shop tab toggle)
 
 function load(){
   try{
@@ -45,6 +47,7 @@ function load(){
       targets: Object.assign(d.targets, raw.targets||{}),
       window: Object.assign(d.window, raw.window||{}),
       usdaKey: raw.usdaKey || d.usdaKey,
+      shop: Object.assign(d.shop, raw.shop||{}),
     };
   }catch(e){ return defaultState(); }
 }
@@ -401,10 +404,147 @@ function renderSettings(){
   $('#version').textContent='Diet Dash '+VERSION;
 }
 
+/* ---------- SHOP tab: shopping list + ideas ---------- */
+const STORES=['Costco','HEB'];
+const shopKey=s=>s.toLowerCase().trim();
+
+function renderShop(){
+  const seg=$('#shopSeg');
+  seg.innerHTML=`<button class="seg-btn ${shopMode==='list'?'on':''}" data-shopmode="list">Shopping list</button>
+    <button class="seg-btn ${shopMode==='ideas'?'on':''}" data-shopmode="ideas">Ideas &amp; pairings</button>`;
+  if(shopMode==='ideas') return renderIdeas();
+  renderShopList();
+}
+
+function renderShopList(){
+  const body=$('#shopBody');
+  const meals=state.meals;
+  const trip=state.shop.trip||[];
+  const chips = meals.length ? `<div class="qa-label" style="margin-top:12px">Add recipes to your trip</div>
+    <div class="qa-row" style="flex-wrap:wrap">${meals.map(m=>`
+      <button class="qa-chip ${trip.includes(m.id)?'meal':''}" data-triptoggle="${m.id}">
+        <span class="qa-nm">${m.emoji?m.emoji+' ':''}${esc(m.name)}</span>
+        <span class="qa-cal">${trip.includes(m.id)?'✓ in list':'+ add'}</span></button>`).join('')}</div>`
+    : `<p class="note">Build some meals first (Pantry → Meals) and they'll show up here to shop for.</p>`;
+
+  // aggregate shopping items from selected meals
+  const agg={};  // key -> {item, store, recipes:Set}
+  for(const id of trip){
+    const m=meals.find(x=>x.id===id); if(!m||!m.shopping) continue;
+    for(const s of m.shopping){
+      const k=shopKey(s.item);
+      if(!agg[k]) agg[k]={item:s.item, store:STORES.includes(s.store)?s.store:'HEB', recipes:new Set()};
+      agg[k].recipes.add(m.name);
+    }
+  }
+  const all=Object.entries(agg);
+  let listHtml='';
+  if(!trip.length){
+    listHtml=`<div class="empty">Tap a recipe above to start your list.</div>`;
+  } else if(!all.length){
+    listHtml=`<div class="empty">These recipes don't have shopping lists yet.</div>`;
+  } else {
+    for(const store of STORES){
+      const items=all.filter(([k,v])=>v.store===store).sort((a,b)=>a[1].item.localeCompare(b[1].item));
+      if(!items.length) continue;
+      const done=items.filter(([k])=>state.shop.checked[k]).length;
+      const allDone=done===items.length;
+      listHtml+=`<div class="storegroup ${allDone?'alldone':''}">
+        <div class="store-head"><span>${store}</span><span class="store-prog">${done}/${items.length}${allDone?' ✓':''}</span></div>
+        ${allDone?`<div class="store-done">✓ Got everything at ${store}!</div>`:''}
+        ${items.map(([k,v])=>`<label class="shopitem ${state.shop.checked[k]?'done':''}">
+          <input type="checkbox" ${state.shop.checked[k]?'checked':''} data-check="${k}">
+          <span class="si-name">${esc(v.item)}</span>
+          ${v.recipes.size>1?`<span class="si-badge">${v.recipes.size} recipes</span>`:''}</label>`).join('')}
+      </div>`;
+    }
+    listHtml+=`<div class="datarow" style="margin-top:14px">
+      <button class="ghost-btn" data-clearchecked>Uncheck all</button>
+      <button class="ghost-btn" data-cleartrip>New trip</button></div>`;
+  }
+  body.innerHTML=chips+listHtml;
+}
+
+const IDEAS=[
+ {e:"🥬",t:"Serve your salads & proteins on",items:[
+   "Butter or romaine lettuce cups — 0 carb, 0 sodium",
+   "Cucumber rounds or celery sticks for crunch",
+   "A halved avocado — scoop the salad right in",
+   "Bell-pepper halves as edible bowls",
+   "Siete grain-free tortillas or cheese crisps",
+   "A bed of baby spinach or spring mix"]},
+ {e:"🔁",t:"Low-carb swaps that still taste great",items:[
+   "Bun → lettuce wrap or your keto bun",
+   "Tortilla chips → Siete grain-free or cheese crisps",
+   "Croutons → chopped walnuts or pecans",
+   "Sugary dressing → olive oil + red wine vinegar, or Greek-yogurt ranch",
+   "Soda / juice → sparkling water + lime, or a splash of Spindrift",
+   "Rice or potato side → cauliflower rice or air-fried cauliflower"]},
+ {e:"🌶️",t:"Flavor without the sodium",items:[
+   "Tabasco (35mg/tsp) and fresh lime & lemon",
+   "Smoked paprika, garlic powder, cumin, black pepper",
+   "Fresh herbs — cilantro, dill, basil, green onion",
+   "Jalapeño & red onion for bite",
+   "Red wine or apple-cider vinegar for brightness",
+   "Everything-but-the-salt seasoning"]},
+ {e:"🍽️",t:"Mix-and-match combos from your pantry",items:[
+   "Tuna or chicken salad + avocado + cucumber",
+   "Hard-boiled eggs + avocado + hot sauce + smoked paprika",
+   "Greek yogurt + berries + hemp & flax (your Power Bowl)",
+   "Grass-fed sausage + sauerkraut + mustard + grilled peppers",
+   "Steak or ground beef + blue cheese + sautéed mushrooms + asparagus",
+   "Cottage cheese + cherry tomatoes + olive oil + black pepper"]},
+ {e:"✅",t:"Best low-carb picks by group",items:[
+   "Veg: leafy greens, cauliflower, broccoli, zucchini, cucumber, asparagus, peppers, avocado, olives, mushrooms",
+   "Fruit: berries are best (straw / rasp / black); green apple in moderation; go easy on banana & grapes",
+   "Nuts: walnuts, pecans, macadamia are lowest-carb; go lighter on cashews & pistachios",
+   "Dairy: Greek yogurt, cheese, butter; keep milk modest (lactose = sugar)",
+   "Fats: olive oil, avocado & avocado oil, butter — skip the seed oils"]},
+];
+function renderIdeas(){
+  $('#shopBody').innerHTML=`
+    <p class="note" style="margin-top:12px">Whole-food, lower-carb, lower-sugar, lower-sodium ideas to pair with what you already buy.</p>
+    ${IDEAS.map(c=>`<div class="idea-card">
+      <div class="idea-head">${c.e} ${esc(c.t)}</div>
+      <ul class="idea-list">${c.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}
+    <p class="note">Low-carb framework inspired by DietDoctor's visual guides — pairings tailored to your pantry.</p>`;
+}
+
+/* delegated Shop interactions */
+$('#shopSeg').addEventListener('click', e=>{
+  const b=e.target.closest('[data-shopmode]'); if(!b) return;
+  shopMode=b.dataset.shopmode; renderShop();
+});
+$('#shopBody').addEventListener('click', e=>{
+  const tt=e.target.closest('[data-triptoggle]');
+  if(tt){ const id=tt.dataset.triptoggle; const i=state.shop.trip.indexOf(id);
+    if(i>=0) state.shop.trip.splice(i,1); else state.shop.trip.push(id); save(); renderShopList(); return; }
+  if(e.target.closest('[data-clearchecked]')){ state.shop.checked={}; save(); renderShopList(); return; }
+  if(e.target.closest('[data-cleartrip]')){ state.shop.trip=[]; state.shop.checked={}; save(); renderShopList(); return; }
+});
+$('#shopBody').addEventListener('change', e=>{
+  const cb=e.target.closest('[data-check]'); if(!cb) return;
+  const k=cb.dataset.check;
+  if(cb.checked) state.shop.checked[k]=true; else delete state.shop.checked[k];
+  save();
+  // update in place (no full re-render — keeps the list steady while shopping)
+  const label=cb.closest('.shopitem'); if(label) label.classList.toggle('done', cb.checked);
+  const group=cb.closest('.storegroup'); if(!group) return;
+  const boxes=[...group.querySelectorAll('input[type=checkbox]')];
+  const done=boxes.filter(b=>b.checked).length, tot=boxes.length, allDone=done===tot;
+  group.classList.toggle('alldone', allDone);
+  const prog=group.querySelector('.store-prog'); if(prog) prog.textContent=`${done}/${tot}${allDone?' ✓':''}`;
+  let banner=group.querySelector('.store-done');
+  const store=group.querySelector('.store-head span').textContent;
+  if(allDone && !banner){ group.querySelector('.store-head').insertAdjacentHTML('afterend',`<div class="store-done">✓ Got everything at ${esc(store)}!</div>`); }
+  else if(!allDone && banner){ banner.remove(); }
+});
+
 function render(){
   if(currentTab==='today') renderToday();
   else if(currentTab==='week') renderWeek();
   else if(currentTab==='pantry') renderPantry($('#pantrySearch').value||'');
+  else if(currentTab==='shop') renderShop();
   else if(currentTab==='settings') renderSettings();
   $('#dayLabel').textContent=fmtDay(viewDate);
   $('#dayNav').style.visibility = currentTab==='today' ? 'visible':'hidden';
@@ -823,7 +963,8 @@ async function loadStarterPantry(){
         const nm=(m.name||'').toLowerCase().trim(); if(!nm || haveM.has(nm)) continue;
         const comps=(m.components||[]).map(c=>({ name:c.name, brand:c.brand||'', serving:c.serving||'1 serving',
           qty:num(c.qty)||1, nutr:Object.fromEntries(NKEYS.map(k=>[k, num((c.nutr||{})[k])])) }));
-        state.meals.push({ id:uid(), name:m.name, emoji:m.emoji||'', components:comps, createdAt:Date.now() });
+        const shopping=Array.isArray(m.shopping)? m.shopping.map(s=>({item:s.item, store:s.store})) : undefined;
+        state.meals.push({ id:uid(), name:m.name, emoji:m.emoji||'', components:comps, shopping, createdAt:Date.now() });
         haveM.add(nm); addedM++;
       }
     }
@@ -942,7 +1083,8 @@ $('#importFile').onchange=e=>{
   r.onload=()=>{ try{ const raw=JSON.parse(r.result);
     state={ pantry:raw.pantry||[], meals:raw.meals||[], log:raw.log||[],
       targets:Object.assign(defaultState().targets, raw.targets||{}),
-      window:Object.assign(defaultState().window, raw.window||{}), usdaKey:raw.usdaKey||'DEMO_KEY' };
+      window:Object.assign(defaultState().window, raw.window||{}), usdaKey:raw.usdaKey||'DEMO_KEY',
+      shop:Object.assign(defaultState().shop, raw.shop||{}) };
     save(); render(); toast('Imported'); }
     catch(err){ toast('Bad file'); } };
   r.readAsText(file);
