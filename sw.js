@@ -1,6 +1,6 @@
 /* Diet Dash service worker — cache the app shell so it opens offline.
    Food lookups (openfoodfacts) always go to network. */
-const CACHE = 'dietdash-v1.3.0';
+const CACHE = 'dietdash-v1.3.1';
 const SHELL = [
   './', './index.html', './app.js?v=1.3.0', './styles.css?v=1.3.0', './manifest.json',
   './pantry-seed.json', './vendor/zxing.min.js',
