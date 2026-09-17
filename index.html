@@ -7,7 +7,7 @@
 <title>Diet Dash</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=1.2.0">
 
 <div id="app">
   <header class="topbar">
@@ -23,6 +23,7 @@
     <!-- TODAY -->
     <section id="view-today" class="view active">
       <div id="windowStrip" class="windowstrip"></div>
+      <div id="quickAdd" class="quickadd" hidden></div>
       <div id="ringsGrid" class="rings"></div>
       <div class="section-title">
         <span>Logged</span>
@@ -41,6 +42,7 @@
 
     <!-- PANTRY -->
     <section id="view-pantry" class="view">
+      <div id="pantrySeg" class="seg"></div>
       <div id="pantryBanner"></div>
       <div class="searchrow">
         <input id="pantrySearch" type="search" placeholder="Search your pantry…" autocomplete="off">
@@ -101,4 +103,4 @@
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="app.js"></script>
+<script src="app.js?v=1.2.0"></script>

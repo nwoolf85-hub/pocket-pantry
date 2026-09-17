@@ -223,6 +223,49 @@ button{cursor:pointer; border:none; background:none}
 
 .delbtn{background:none; color:var(--over); font-weight:600; width:100%; padding:12px; margin-top:2px}
 
+/* quick add */
+.quickadd{margin-top:10px}
+.qa-label{color:var(--faint); font-size:12px; text-transform:uppercase; letter-spacing:.9px;
+  font-weight:700; margin:0 2px 8px}
+.qa-row{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch}
+.qa-row::-webkit-scrollbar{display:none}
+.qa-chip{flex:0 0 auto; display:flex; flex-direction:column; gap:2px; align-items:flex-start;
+  background:var(--panel); border:1px solid var(--line2); border-radius:13px; padding:9px 13px; max-width:200px}
+.qa-chip:active{transform:scale(.96)}
+.qa-chip .qa-nm{font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px}
+.qa-chip .qa-cal{font-size:11px; color:var(--faint)}
+.qa-chip.meal{background:linear-gradient(135deg,rgba(201,128,63,.18),rgba(230,183,78,.1));
+  border-color:rgba(230,183,78,.4)}
+.qa-chip.meal .qa-nm{color:var(--cream)}
+
+/* meal chip + expandable log rows */
+.meal-chip{display:inline-block; font-size:9px; font-weight:800; letter-spacing:.5px; text-transform:uppercase;
+  color:#20140a; background:linear-gradient(90deg,var(--copper),var(--gold));
+  padding:1px 6px; border-radius:5px; vertical-align:middle; margin-left:4px}
+.logitem{flex-direction:column; align-items:stretch; padding:0}
+.logitem .li-main{display:flex; align-items:center; gap:12px; padding:11px 13px; width:100%}
+.li-caret{color:var(--faint); font-size:12px; padding:4px 2px 4px 6px; margin:-4px -4px -4px 0}
+.li-breakdown{border-top:1px solid var(--line); padding:6px 13px 10px; display:flex; flex-direction:column; gap:4px}
+.bd-row{display:flex; justify-content:space-between; font-size:12.5px; color:var(--dim)}
+.bd-row span:last-child{color:var(--faint); font-variant-numeric:tabular-nums}
+
+/* segmented control (Foods | Meals) */
+.seg{display:flex; gap:4px; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  padding:3px; margin:8px 0 2px}
+.seg-btn{flex:1; padding:8px; border-radius:9px; color:var(--dim); font-weight:700; font-size:14px}
+.seg-btn.on{background:var(--panel2); color:var(--gold); box-shadow:0 1px 4px rgba(0,0,0,.25)}
+
+/* meal builder component rows */
+.mealcomp{display:flex; align-items:center; gap:10px; background:var(--panel); border:1px solid var(--line);
+  border-radius:11px; padding:9px 11px; margin-bottom:7px}
+.mc-nm{flex:1; min-width:0; font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mc-qty{display:flex; align-items:center; gap:8px}
+.mc-qty button{width:26px; height:26px; border-radius:8px; background:var(--navy2); border:1px solid var(--line2);
+  color:var(--cream); font-weight:800; font-size:15px; line-height:1}
+.mc-qty b{min-width:30px; text-align:center; color:var(--gold); font-variant-numeric:tabular-nums}
+.mc-cal{font-variant-numeric:tabular-nums; color:var(--cream); font-weight:700; min-width:34px; text-align:right}
+.mc-del{color:var(--faint); padding:4px 2px 4px 6px; font-size:13px}
+
 .toast{position:fixed; left:50%; bottom:calc(var(--tabh) + 14px); transform:translateX(-50%);
   z-index:80; background:var(--panel2); border:1px solid var(--line2); color:var(--cream);
   padding:11px 18px; border-radius:999px; font-weight:600; font-size:14px;

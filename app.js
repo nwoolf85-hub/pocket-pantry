@@ -2,7 +2,7 @@
    Food lookups via Open Food Facts (no key). */
 'use strict';
 
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.2.0';
 const LS = 'dietdash.v1';
 
 /* ---------- nutrient model ----------
@@ -23,7 +23,8 @@ const NKEYS = NUTRIENTS.map(n=>n.key);
 /* ---------- state ---------- */
 const defaultState = () => ({
   pantry: [],           // {id,name,brand,serving,src,verified, nutr:{...}}
-  log: [],              // {id,foodId,name,brand,ts,qty, nutr:{...per-serving snapshot...}}
+  meals: [],            // {id,name,emoji,components:[{name,brand,serving,qty,nutr}],createdAt}
+  log: [],              // {id,foodId,name,brand,ts,qty,nutr, isMeal?,components?,emoji?}
   targets: Object.fromEntries(NUTRIENTS.map(n=>[n.key,n.dflt])),
   window: { start: 12, len: 8 },   // 8-hour window starting noon
   usdaKey: 'DEMO_KEY',             // free key from fdc.nal.usda.gov/api-key-signup
@@ -32,6 +33,7 @@ const defaultState = () => ({
 let state = load();
 let viewDate = startOfDay(new Date());   // which day the Today view shows
 let currentTab = 'today';
+let pantryMode = 'foods';                // 'foods' | 'meals' (Pantry tab toggle)
 
 function load(){
   try{
@@ -39,7 +41,7 @@ function load(){
     if(!raw) return defaultState();
     const d = defaultState();
     return {
-      pantry: raw.pantry||[], log: raw.log||[],
+      pantry: raw.pantry||[], meals: raw.meals||[], log: raw.log||[],
       targets: Object.assign(d.targets, raw.targets||{}),
       window: Object.assign(d.window, raw.window||{}),
       usdaKey: raw.usdaKey || d.usdaKey,
@@ -69,6 +71,57 @@ function totalsFor(d){
   for(const e of entriesFor(d)) for(const k of NKEYS) t[k]+=(e.nutr[k]||0)*e.qty;
   return t;
 }
+/* ---------- meals ---------- */
+function mealTotals(meal){
+  const t=Object.fromEntries(NKEYS.map(k=>[k,0]));
+  for(const c of (meal.components||[])) for(const k of NKEYS) t[k]+=(c.nutr[k]||0)*(c.qty||1);
+  return Object.fromEntries(NKEYS.map(k=>[k, Math.round(t[k]*100)/100]));
+}
+// Present a meal as a "food" so it flows through the log editor unchanged.
+function mealAsFood(meal){
+  return { id:meal.id, name:meal.name, brand:'Meal', serving:'1 serving',
+    nutr:mealTotals(meal), isMeal:true, components:meal.components, emoji:meal.emoji };
+}
+// pretty fractions for portions
+function fmtQty(q){
+  const fr=[[0.25,'¼'],[0.333,'⅓'],[0.5,'½'],[0.667,'⅔'],[0.75,'¾']];
+  for(const [v,s] of fr){ if(Math.abs(q-v)<0.02) return s; if(Math.abs(q-(1+v))<0.02) return '1'+s; }
+  return String(Math.round(q*100)/100);
+}
+// snap a portion up/down through a set of friendly values
+function stepQty(q,dir){
+  const steps=[0.25,0.333,0.5,0.667,0.75,1,1.5,2,3,4];
+  let idx=0,best=1e9; steps.forEach((v,i)=>{const d=Math.abs(v-q); if(d<best){best=d;idx=i;}});
+  return steps[Math.max(0,Math.min(steps.length-1, idx+dir))];
+}
+
+// Recent + frequent, one-tap. Meals first (always shown), then foods by count/recency.
+function quickAddItems(){
+  const out=[], seen=new Set();
+  for(const m of state.meals){ const k='m:'+m.name.toLowerCase(); if(seen.has(k))continue; seen.add(k);
+    out.push({name:m.name, emoji:m.emoji, isMeal:true, mealId:m.id, nutr:mealTotals(m)}); }
+  const byName={};
+  for(const e of state.log){ if(e.isMeal) continue; const k=e.name.toLowerCase();
+    if(!byName[k]) byName[k]={name:e.name, brand:e.brand, last:e.ts, count:0, nutr:e.nutr};
+    byName[k].count++; if(e.ts>=byName[k].last){ byName[k].last=e.ts; byName[k].nutr=e.nutr; } }
+  Object.values(byName).sort((a,b)=> b.count-a.count || b.last-a.last).forEach(f=>{
+    const k='f:'+f.name.toLowerCase(); if(seen.has(k)||out.length>=10) return; seen.add(k);
+    out.push({name:f.name, brand:f.brand, isMeal:false, nutr:f.nutr}); });
+  return out.slice(0,10);
+}
+function logQuick(item){
+  let nutr, components, name=item.name, isMeal=item.isMeal, emoji=item.emoji;
+  if(item.mealId){ const m=state.meals.find(x=>x.id===item.mealId);
+    if(m){ nutr=mealTotals(m); components=m.components.map(c=>({...c})); name=m.name; isMeal=true; emoji=m.emoji; } }
+  if(!nutr) nutr={...item.nutr};
+  const ts=Date.now();
+  const entry={ id:uid(), name, brand:item.brand||'', ts, qty:1, nutr, isMeal:!!isMeal, components, emoji };
+  state.log.push(entry); save();
+  viewDate=startOfDay(new Date(ts));
+  render();
+  toastUndo('Logged '+name, ()=>{ state.log=state.log.filter(e=>e.id!==entry.id); save(); render(); });
+}
+
 function inWindow(ts){
   const h = new Date(ts).getHours()+new Date(ts).getMinutes()/60;
   const s=state.window.start, e=s+state.window.len;
@@ -106,7 +159,21 @@ function statCard(k, val, tgt){
   </div>`;
 }
 
+let qaCache=[];
+function renderQuickAdd(){
+  const box=$('#quickAdd'); if(!box) return;
+  qaCache=quickAddItems();
+  if(!qaCache.length || dayKey(viewDate)!==dayKey(new Date())){ box.hidden=true; box.innerHTML=''; return; }
+  box.hidden=false;
+  box.innerHTML=`<div class="qa-label">Quick add</div>
+    <div class="qa-row">${qaCache.map((it,i)=>`
+      <button class="qa-chip ${it.isMeal?'meal':''}" data-qa="${i}">
+        <span class="qa-nm">${it.emoji?it.emoji+' ':''}${esc(it.name)}</span>
+        <span class="qa-cal">${Math.round(it.nutr.kcal||0)} cal${it.isMeal?' · meal':''}</span></button>`).join('')}</div>`;
+}
+
 function renderToday(){
+  renderQuickAdd();
   const totals=totalsFor(viewDate);
   const grid=$('#ringsGrid');
   grid.innerHTML = NUTRIENTS.map(n=>statCard(n.key, totals[n.key], state.targets[n.key])).join('');
@@ -141,11 +208,20 @@ function renderToday(){
   list.innerHTML=ents.map(e=>{
     const kcal=Math.round((e.nutr.kcal||0)*e.qty);
     const sod=Math.round((e.nutr.sodium||0)*e.qty);
-    return `<li class="logitem ${inWindow(e.ts)?'':'out'}" data-log="${e.id}">
-      <span class="time">${fmtTime(e.ts)}</span>
-      <span class="mid"><div class="nm">${esc(e.name)}</div>
-        <div class="sub">${e.qty!==1?e.qty+'× · ':''}${sod}mg sodium${e.brand?' · '+esc(e.brand):''}</div></span>
-      <span class="kcal">${kcal}</span></li>`;
+    const qlabel = e.qty!==1 ? fmtQty(e.qty)+'× · ' : '';
+    const sub = e.isMeal
+      ? `${qlabel}${sod}mg sodium${e.components?' · '+e.components.length+' ingredients':''}`
+      : `${qlabel}${sod}mg sodium${e.brand?' · '+esc(e.brand):''}`;
+    const caret = (e.isMeal && e.components) ? `<button class="li-caret" data-expand="${e.id}">▸</button>` : '';
+    const breakdown = (e.isMeal && e.components) ? `<div class="li-breakdown" id="bd-${e.id}" hidden>${
+      e.components.map(c=>`<div class="bd-row"><span>${fmtQty((c.qty||1)*e.qty)}× ${esc(c.name)}</span><span>${Math.round((c.nutr.kcal||0)*(c.qty||1)*e.qty)} cal</span></div>`).join('')}</div>` : '';
+    return `<li class="logitem ${inWindow(e.ts)?'':'out'} ${e.isMeal?'ismeal':''}">
+      <div class="li-main" data-log="${e.id}">
+        <span class="time">${fmtTime(e.ts)}</span>
+        <span class="mid"><div class="nm">${e.emoji?e.emoji+' ':''}${esc(e.name)}${e.isMeal?' <span class="meal-chip">meal</span>':''}</div>
+          <div class="sub">${sub}</div></span>
+        <span class="kcal">${kcal}</span>${caret}</div>
+      ${breakdown}</li>`;
   }).join('');
 }
 
@@ -182,6 +258,16 @@ function pillFor(k,val){
 
 function renderPantry(q=''){
   const list=$('#pantryList');
+  const seg=$('#pantrySeg');
+  if(seg){
+    seg.innerHTML=`<button class="seg-btn ${pantryMode==='foods'?'on':''}" data-mode="foods">Foods</button>
+      <button class="seg-btn ${pantryMode==='meals'?'on':''}" data-mode="meals">Meals${state.meals.length?' ('+state.meals.length+')':''}</button>`;
+    $$('#pantrySeg [data-mode]').forEach(b=>b.onclick=()=>{ pantryMode=b.dataset.mode; renderPantry($('#pantrySearch').value||''); });
+  }
+  const nb=$('#newFoodBtn'); if(nb) nb.textContent = pantryMode==='meals' ? '+ Meal' : '+ New';
+  const ps=$('#pantrySearch'); if(ps) ps.placeholder = pantryMode==='meals' ? 'Search your meals…' : 'Search your pantry…';
+  if(pantryMode==='meals') return renderMealsList(q);
+
   const banner=$('#pantryBanner');
   if(banner){
     const un=state.pantry.filter(p=>!p.verified).length;
@@ -205,6 +291,87 @@ function renderPantry(q=''){
           <span class="src ${p.verified?'verified':''}">${p.verified?'✓ verified':esc(p.src||'manual')}</span></div></span>
       <button class="log" data-logfood="${p.id}">Log</button>
     </li>`).join('');
+}
+
+function renderMealsList(q=''){
+  const list=$('#pantryList'); const banner=$('#pantryBanner'); if(banner) banner.innerHTML='';
+  if(!state.meals.length){ list.innerHTML=`<li class="empty">No meals yet.<br><br>
+    <button class="chip-btn" id="emptyNewMeal">+ Build a meal</button><br><br>
+    A meal is a saved combo (e.g. your breakfast bowl) you log in one tap.</li>`;
+    const b=$('#emptyNewMeal'); if(b) b.onclick=()=>openMealBuilder(null); return; }
+  const meals=state.meals.filter(m=>!q || m.name.toLowerCase().includes(q.toLowerCase()))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+  if(!meals.length){ list.innerHTML=`<li class="empty">No matches.</li>`; return; }
+  list.innerHTML=meals.map(m=>{ const t=mealTotals(m);
+    return `<li class="pantryitem" data-meal="${m.id}">
+      <span class="mid"><div class="nm">${m.emoji?m.emoji+' ':''}${esc(m.name)}</div>
+        <div class="sub">${m.components.length} ingredients · ${Math.round(t.kcal)} cal · ${Math.round(t.sodium)}mg Na · ${rnd(t.protein,'protein')}g protein</div></span>
+      <button class="log" data-logmeal="${m.id}">Log</button></li>`;
+  }).join('');
+}
+
+/* ---------- MEAL BUILDER ---------- */
+function openMealBuilder(meal){
+  let comps = meal ? meal.components.map(c=>({...c, nutr:{...c.nutr}})) : [];
+  openSheet(`
+    <div class="rec-head"><span>${meal?'Edit meal':'New meal'}</span>
+      ${meal?'<button class="linkbtn" id="mealDelete" style="width:auto;color:var(--over);padding:6px 12px">Delete</button>':''}</div>
+    <div class="row2">
+      <div class="field"><label>Meal name</label><input id="mealName" value="${esc(meal?meal.name:'')}" placeholder="e.g. Berry Protein Power Bowl"></div>
+      <div class="field" style="max-width:84px"><label>Icon</label><input id="mealEmoji" value="${esc(meal?(meal.emoji||''):'')}" placeholder="🥣" maxlength="2"></div>
+    </div>
+    <div class="section-title" style="margin:10px 2px 6px"><span>Ingredients</span></div>
+    <div id="mealComps"></div>
+    <div class="field"><label>Add ingredient from your pantry</label>
+      <input id="mealSearch" type="search" placeholder="Search a food you've saved…"></div>
+    <ul class="results" id="mealAddResults"></ul>
+    <div class="nutro-preview" id="mealTotals"></div>
+    <button class="primary" id="mealSave">${meal?'Save changes':'Save meal'}</button>`);
+
+  const paint=()=>{
+    const box=$('#mealComps');
+    if(!comps.length){ box.innerHTML=`<p class="note" style="margin:0 2px 8px">No ingredients yet — search below to add them.</p>`; }
+    else box.innerHTML=comps.map((c,i)=>`
+      <div class="mealcomp">
+        <span class="mc-nm">${esc(c.name)}</span>
+        <span class="mc-qty">
+          <button data-cdec="${i}">−</button><b>${fmtQty(c.qty)}×</b><button data-cinc="${i}">+</button>
+        </span>
+        <span class="mc-cal">${Math.round((c.nutr.kcal||0)*c.qty)}</span>
+        <button class="mc-del" data-crm="${i}" aria-label="Remove">✕</button>
+      </div>`).join('');
+    const t=Object.fromEntries(NKEYS.map(k=>[k,0]));
+    for(const c of comps) for(const k of NKEYS) t[k]+=(c.nutr[k]||0)*c.qty;
+    $('#mealTotals').innerHTML=['kcal','protein','fiber','sodium'].map(k=>{ const n=NUTRIENTS.find(x=>x.key===k);
+      return `<div class="np"><div class="n">${n.name}</div><div class="v">${rnd(t[k],k)}${n.unit}</div></div>`; }).join('');
+    $$('#mealComps [data-cinc]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.cinc; comps[i].qty=stepQty(comps[i].qty,1); paint(); });
+    $$('#mealComps [data-cdec]').forEach(b=>b.onclick=()=>{ const i=+b.dataset.cdec; comps[i].qty=stepQty(comps[i].qty,-1); paint(); });
+    $$('#mealComps [data-crm]').forEach(b=>b.onclick=()=>{ comps.splice(+b.dataset.crm,1); paint(); });
+  };
+  paint();
+
+  const ms=$('#mealSearch');
+  ms.oninput=()=>{ const q=ms.value.toLowerCase().trim(); const box=$('#mealAddResults');
+    if(!q){ box.innerHTML=''; return; }
+    const hits=state.pantry.filter(p=>(p.name+' '+(p.brand||'')).toLowerCase().includes(q)).slice(0,8);
+    box.innerHTML=hits.length? hits.map(p=>`<li class="result"><span class="mid"><div class="nm">${esc(p.name)}</div>
+      <div class="sub">${esc(p.serving||'')} · ${Math.round(p.nutr.kcal||0)} cal</div></span>
+      <button class="pick" data-addcomp="${p.id}">Add</button></li>`).join('')
+      : `<li class="searching">No pantry match. Add it under Foods first.</li>`;
+    $$('#mealAddResults [data-addcomp]').forEach(b=>b.onclick=()=>{ const p=state.pantry.find(x=>x.id===b.dataset.addcomp);
+      if(p){ comps.push({ name:p.name, brand:p.brand||'', serving:p.serving||'1 serving', qty:1, nutr:{...p.nutr} });
+        ms.value=''; box.innerHTML=''; paint(); ms.focus(); } });
+  };
+
+  $('#mealSave').onclick=()=>{
+    const nm=$('#mealName').value.trim(); if(!nm){ toast('Name the meal first'); return; }
+    if(!comps.length){ toast('Add at least one ingredient'); return; }
+    const em=$('#mealEmoji').value.trim();
+    if(meal){ meal.name=nm; meal.emoji=em; meal.components=comps; }
+    else state.meals.push({ id:uid(), name:nm, emoji:em, components:comps, createdAt:Date.now() });
+    save(); closeSheet(); pantryMode='meals'; render(); toast('Meal saved');
+  };
+  if(meal) $('#mealDelete').onclick=()=>{ state.meals=state.meals.filter(m=>m.id!==meal.id); save(); closeSheet(); render(); toast('Meal deleted'); };
 }
 
 function renderSettings(){
@@ -259,16 +426,26 @@ function openSheet(html){ $('#sheetBody').innerHTML=html; $('#sheet').hidden=fal
 function closeSheet(){ $('#sheet').hidden=true; $('#sheetBody').innerHTML=''; }
 $('#sheet').addEventListener('click', e=>{ if(e.target.dataset.close!==undefined) closeSheet(); });
 
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false;
+function toast(msg){ const t=$('#toast'); t.onclick=null; t.textContent=msg; t.hidden=false;
   clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 1800); }
+function toastUndo(msg, undoFn){
+  const t=$('#toast'); t.innerHTML=esc(msg)+' · <b style="color:var(--gold)">Undo</b>'; t.hidden=false;
+  t.onclick=()=>{ undoFn(); t.hidden=true; t.onclick=null; };
+  clearTimeout(toast._t); toast._t=setTimeout(()=>{ t.hidden=true; t.onclick=null; }, 4200);
+}
 
 /* ---------- ADD FOOD FLOW ---------- */
 $('#addFromToday').onclick=openAddFlow;
-$('#newFoodBtn').onclick=()=>openFoodEditor(null);
+$('#newFoodBtn').onclick=()=>{ if(pantryMode==='meals') openMealBuilder(null); else openFoodEditor(null); };
 
 function openAddFlow(){
   openSheet(`
     <h2>Add food</h2>
+    ${state.meals.length?`<div class="section-title" style="margin:2px 2px 8px"><span>Your meals</span></div>
+      <ul class="results" id="addMeals">${state.meals.map(m=>{ const t=mealTotals(m);
+        return `<li class="result"><span class="mid"><div class="nm">${m.emoji?m.emoji+' ':''}${esc(m.name)}</div>
+          <div class="sub">${m.components.length} ingredients · ${Math.round(t.kcal)} cal · ${Math.round(t.sodium)}mg Na</div></span>
+          <button class="pick" data-mealadd="${m.id}">Log</button></li>`; }).join('')}</ul>`:''}
     ${state.pantry.length?`<div class="field"><label>From your pantry</label>
       <input id="quickPantry" type="search" placeholder="Type a staple you’ve saved…"></div>
       <ul class="results" id="pantryQuick"></ul>`:''}
@@ -285,6 +462,7 @@ function openAddFlow(){
     <button class="linkbtn" id="manualNew">+ Enter a food manually</button>`);
   $('#manualNew').onclick=()=>openFoodEditor(null);
   $('#scanBtn').onclick=openScanner;
+  $$('#addMeals [data-mealadd]').forEach(b=>b.onclick=()=>{ const m=state.meals.find(x=>x.id===b.dataset.mealadd); if(m) openLogEditor(mealAsFood(m)); });
 
   const bc=$('#barcodeInput'), bmsg=$('#barcodeMsg');
   const doBarcode=()=>{ const code=(bc.value||'').replace(/\D/g,''); if(code.length<6){ bmsg.hidden=false; bmsg.textContent='Enter at least 6 digits.'; return; }
@@ -586,7 +764,8 @@ function openLogEditor(food, existing){
     const ts=new Date(Y,M-1,D,h,m).getTime();
     if(existing){ Object.assign(existing,{qty:q,ts,name:food.name,brand:food.brand,nutr:food.nutr}); }
     else { state.log.push({ id:uid(), foodId:food.id, name:food.name, brand:food.brand, ts, qty:q,
-      nutr:{...food.nutr} }); }
+      nutr:{...food.nutr}, isMeal:!!food.isMeal,
+      components:food.components?food.components.map(c=>({...c})):undefined, emoji:food.emoji }); }
     save(); closeSheet();
     viewDate=startOfDay(new Date(ts)); currentTab='today';
     $$('.tab').forEach(x=>x.classList.toggle('active',x.dataset.view==='today'));
@@ -597,12 +776,23 @@ function openLogEditor(food, existing){
 }
 
 /* ---------- list interactions ---------- */
+$('#quickAdd').addEventListener('click', e=>{
+  const c=e.target.closest('[data-qa]'); if(!c) return;
+  const it=qaCache[+c.dataset.qa]; if(it) logQuick(it);
+});
 $('#logList').addEventListener('click', e=>{
+  const cx=e.target.closest('[data-expand]');
+  if(cx){ const bd=$('#bd-'+cx.dataset.expand); if(bd){ bd.hidden=!bd.hidden; cx.textContent=bd.hidden?'▸':'▾'; } return; }
   const li=e.target.closest('[data-log]'); if(!li) return;
   const entry=state.log.find(x=>x.id===li.dataset.log); if(!entry) return;
-  openLogEditor({ name:entry.name, brand:entry.brand, serving:'1 serving', nutr:entry.nutr }, entry);
+  openLogEditor({ name:entry.name, brand:entry.brand, serving:'1 serving', nutr:entry.nutr,
+    isMeal:entry.isMeal, components:entry.components, emoji:entry.emoji }, entry);
 });
 $('#pantryList').addEventListener('click', e=>{
+  const logMeal=e.target.closest('[data-logmeal]');
+  if(logMeal){ const m=state.meals.find(x=>x.id===logMeal.dataset.logmeal); if(m) openLogEditor(mealAsFood(m)); return; }
+  const mealItem=e.target.closest('[data-meal]');
+  if(mealItem){ const m=state.meals.find(x=>x.id===mealItem.dataset.meal); if(m) openMealBuilder(m); return; }
   const logBtn=e.target.closest('[data-logfood]');
   if(logBtn){ const p=state.pantry.find(x=>x.id===logBtn.dataset.logfood); if(p) openLogEditor(p); return; }
   const item=e.target.closest('[data-food]');
@@ -624,8 +814,22 @@ async function loadStarterPantry(){
         src:f.src||'seed', code:f.code||null, verified:!!f.verified, nutr });
       have.add(nm); added++;
     }
+    // seed meals (and retire any legacy flat "recipe" pantry item they supersede)
+    let addedM=0;
+    if(Array.isArray(j.meals) && j.meals.length){
+      state.pantry=state.pantry.filter(p=>p.src!=='recipe');
+      const haveM=new Set(state.meals.map(m=>(m.name||'').toLowerCase().trim()));
+      for(const m of j.meals){
+        const nm=(m.name||'').toLowerCase().trim(); if(!nm || haveM.has(nm)) continue;
+        const comps=(m.components||[]).map(c=>({ name:c.name, brand:c.brand||'', serving:c.serving||'1 serving',
+          qty:num(c.qty)||1, nutr:Object.fromEntries(NKEYS.map(k=>[k, num((c.nutr||{})[k])])) }));
+        state.meals.push({ id:uid(), name:m.name, emoji:m.emoji||'', components:comps, createdAt:Date.now() });
+        haveM.add(nm); addedM++;
+      }
+    }
     save(); render();
-    toast(added? `Added ${added} foods to pantry` : 'Pantry already up to date');
+    const parts=[]; if(added) parts.push(`${added} foods`); if(addedM) parts.push(`${addedM} meal${addedM>1?'s':''}`);
+    toast(parts.length? 'Added '+parts.join(' + ') : 'Pantry already up to date');
   }catch(e){ toast('Could not load starter pantry'); }
 }
 
@@ -736,9 +940,9 @@ $('#importFile').onchange=e=>{
   const file=e.target.files[0]; if(!file) return;
   const r=new FileReader();
   r.onload=()=>{ try{ const raw=JSON.parse(r.result);
-    state={ pantry:raw.pantry||[], log:raw.log||[],
+    state={ pantry:raw.pantry||[], meals:raw.meals||[], log:raw.log||[],
       targets:Object.assign(defaultState().targets, raw.targets||{}),
-      window:Object.assign(defaultState().window, raw.window||{}) };
+      window:Object.assign(defaultState().window, raw.window||{}), usdaKey:raw.usdaKey||'DEMO_KEY' };
     save(); render(); toast('Imported'); }
     catch(err){ toast('Bad file'); } };
   r.readAsText(file);
