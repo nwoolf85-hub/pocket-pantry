@@ -146,6 +146,7 @@
     {"name":"Teton Waters Ranch Jalapeno Cheddar Sausage (grass-fed)","brand":"Teton Waters Ranch (Costco)","serving":"1 link","verified":true,"src":"label-package","code":null,"nutr":{"kcal":190,"sodium":750,"protein":12,"sugar":0,"fiber":0,"fat":15,"satfat":6,"chol":45,"potassium":230}},
     {"name":"Orgain Organic Protein + Superfoods (Chocolate)","brand":"Orgain (Costco)","serving":"2 scoops (46g)","verified":true,"src":"label","code":null,"nutr":{"kcal":170,"sodium":310,"protein":21,"sugar":1,"fiber":4,"fat":4,"satfat":0.5,"chol":0,"potassium":400}},
     {"name":"Kirkland Ultra-Filtered 2% Milk","brand":"Kirkland (Costco)","serving":"8 oz (240ml)","verified":true,"src":"label","code":"0196633809865","nutr":{"kcal":120,"sodium":110,"protein":13,"sugar":6,"fiber":0,"fat":4.5,"satfat":3,"chol":20,"potassium":370}},
+    {"name":"HEB Mustard Potato Salad (German-style)","brand":"Hill Country Fare (HEB)","serving":"1/2 cup (140g)","verified":true,"src":"label","code":null,"nutr":{"kcal":230,"sodium":420,"protein":3,"sugar":4,"fiber":3,"fat":13,"satfat":2,"chol":20,"potassium":376}},
     {"name":"Tallow fries","brand":"Costco","serving":"3 oz (84g)","nutr":{"kcal":170,"sodium":230,"protein":2,"sugar":0,"fiber":2,"fat":8,"satfat":3,"chol":0,"potassium":350}},
     {"name":"Organic cauliflower stir fry","brand":"Costco","serving":"1 cup (120g)","nutr":{"kcal":60,"sodium":300,"protein":3,"sugar":4,"fiber":3,"fat":2,"satfat":0.3,"chol":0,"potassium":250}},
 
