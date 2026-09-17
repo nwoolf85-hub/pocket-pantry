@@ -142,6 +142,8 @@
     {"name":"Just Bare Lightly Breaded Spicy Chicken Strips","brand":"Just Bare (Costco)","serving":"2 pieces (93g)","verified":true,"src":"label","code":"0077013615606","nutr":{"kcal":170,"sodium":620,"protein":15.8,"sugar":1.9,"fiber":0,"fat":6,"satfat":1,"chol":45,"potassium":360}},
     {"name":"Kinder's Buttery Buffalo Wing Sauce","brand":"Kinder's","serving":"1 Tbsp (16g)","verified":true,"src":"label","code":"0755795655194","nutr":{"kcal":25,"sodium":380,"protein":0,"sugar":1,"fiber":0,"fat":2,"satfat":0,"chol":0,"potassium":0}},
     {"name":"Avocado oil","brand":"","serving":"1 Tbsp (14g)","verified":true,"src":"label","code":null,"nutr":{"kcal":124,"sodium":0,"protein":0,"sugar":0,"fiber":0,"fat":14,"satfat":1.6,"chol":0,"potassium":0}},
+    {"name":"Teton Waters Ranch Polish Sausage (grass-fed)","brand":"Teton Waters Ranch (Costco)","serving":"1 link (71g)","verified":true,"src":"label","code":null,"nutr":{"kcal":180,"sodium":570,"protein":12,"sugar":0,"fiber":0,"fat":15,"satfat":6,"chol":45,"potassium":230}},
+    {"name":"Teton Waters Ranch Jalapeno Cheddar Sausage (grass-fed)","brand":"Teton Waters Ranch (Costco)","serving":"1 link","verified":true,"src":"label-package","code":null,"nutr":{"kcal":190,"sodium":750,"protein":12,"sugar":0,"fiber":0,"fat":15,"satfat":6,"chol":45,"potassium":230}},
     {"name":"Tallow fries","brand":"Costco","serving":"3 oz (84g)","nutr":{"kcal":170,"sodium":230,"protein":2,"sugar":0,"fiber":2,"fat":8,"satfat":3,"chol":0,"potassium":350}},
     {"name":"Organic cauliflower stir fry","brand":"Costco","serving":"1 cup (120g)","nutr":{"kcal":60,"sodium":300,"protein":3,"sugar":4,"fiber":3,"fat":2,"satfat":0.3,"chol":0,"potassium":250}},
 
@@ -176,6 +178,16 @@
         {"name":"Salt + spices (seasoning)","brand":"","serving":"to taste","qty":1,"nutr":{"kcal":0,"sodium":150,"protein":0,"sugar":0,"fiber":0,"fat":0,"satfat":0,"chol":0,"potassium":0}},
         {"name":"Blue cheese dressing (HEB, light — dip + salad)","brand":"Hill Country Fare","serving":"2 Tbsp (30g)","qty":0.75,"nutr":{"kcal":145,"sodium":320,"protein":1,"sugar":1,"fiber":0,"fat":15,"satfat":3,"chol":10,"potassium":30}},
         {"name":"Kinder's Buttery Buffalo Wing Sauce","brand":"Kinder's","serving":"1 Tbsp (16g)","qty":0.333,"nutr":{"kcal":25,"sodium":380,"protein":0,"sugar":1,"fiber":0,"fat":2,"satfat":0,"chol":0,"potassium":0}}
+      ]
+    },
+    {
+      "name": "Teton Polish Sausage Plate",
+      "emoji": "🌭",
+      "components": [
+        {"name":"Teton Waters Ranch Polish Sausage (grass-fed)","brand":"Teton Waters Ranch (Costco)","serving":"1 link (71g)","qty":1,"nutr":{"kcal":180,"sodium":570,"protein":12,"sugar":0,"fiber":0,"fat":15,"satfat":6,"chol":45,"potassium":230}},
+        {"name":"Sauerkraut","brand":"Costco","serving":"2 tbsp (30g)","qty":1,"nutr":{"kcal":5,"sodium":200,"protein":0.3,"sugar":0.5,"fiber":0.8,"fat":0,"satfat":0,"chol":0,"potassium":40}},
+        {"name":"Yellow mustard","brand":"HEB","serving":"1 tsp (5g)","qty":2,"nutr":{"kcal":3,"sodium":55,"protein":0.2,"sugar":0,"fiber":0.1,"fat":0.2,"satfat":0,"chol":0,"potassium":7}},
+        {"name":"Keto hotdog bun","brand":"HEB","serving":"1 bun (50g)","qty":1,"nutr":{"kcal":110,"sodium":190,"protein":9,"sugar":1,"fiber":9,"fat":4,"satfat":0.5,"chol":0,"potassium":80}}
       ]
     }
   ]
