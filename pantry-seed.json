@@ -149,6 +149,8 @@
     {"name":"HEB Mustard Potato Salad (German-style)","brand":"Hill Country Fare (HEB)","serving":"1/2 cup (140g)","verified":true,"src":"label","code":null,"nutr":{"kcal":230,"sodium":420,"protein":3,"sugar":4,"fiber":3,"fat":13,"satfat":2,"chol":20,"potassium":376}},
     {"name":"Kirkland Canned Chicken Breast (Less Sodium)","brand":"Kirkland (Costco)","serving":"2 oz (56g)","verified":true,"src":"label","code":"0019722352496","nutr":{"kcal":60,"sodium":200,"protein":13,"sugar":0,"fiber":0,"fat":1,"satfat":0,"chol":25,"potassium":70}},
     {"name":"Celery","brand":"HEB","serving":"1 stalk (40g)","verified":true,"src":"label","code":null,"nutr":{"kcal":6,"sodium":32,"protein":0.3,"sugar":0.7,"fiber":0.4,"fat":0,"satfat":0,"chol":0,"potassium":104}},
+    {"name":"Kirkland Solid White Albacore Tuna (in water)","brand":"Kirkland (Costco)","serving":"2 oz (56g)","verified":true,"src":"label","code":"0096619058143","nutr":{"kcal":80,"sodium":180,"protein":15,"sugar":0,"fiber":0,"fat":1,"satfat":0,"chol":25,"potassium":100}},
+    {"name":"Granny Smith apple (small)","brand":"HEB","serving":"1 small (130g)","verified":true,"src":"label","code":null,"nutr":{"kcal":60,"sodium":1,"protein":0.3,"sugar":11,"fiber":2.8,"fat":0,"satfat":0,"chol":0,"potassium":120}},
     {"name":"Tallow fries","brand":"Costco","serving":"3 oz (84g)","nutr":{"kcal":170,"sodium":230,"protein":2,"sugar":0,"fiber":2,"fat":8,"satfat":3,"chol":0,"potassium":350}},
     {"name":"Organic cauliflower stir fry","brand":"Costco","serving":"1 cup (120g)","nutr":{"kcal":60,"sodium":300,"protein":3,"sugar":4,"fiber":3,"fat":2,"satfat":0.3,"chol":0,"potassium":250}},
 
@@ -223,6 +225,19 @@
         {"name":"Celery, diced (1 stalk)","brand":"HEB","serving":"1 stalk","qty":1,"nutr":{"kcal":6,"sodium":32,"protein":0.3,"sugar":0.7,"fiber":0.4,"fat":0,"satfat":0,"chol":0,"potassium":104}},
         {"name":"Walnuts, chopped (1 Tbsp)","brand":"Kirkland (Costco)","serving":"1 Tbsp","qty":1,"nutr":{"kcal":52,"sodium":1,"protein":1,"sugar":0.2,"fiber":0.5,"fat":5.2,"satfat":0.3,"chol":0,"potassium":33}},
         {"name":"Tabasco + Dijon + jalapeno + onion + spices","brand":"","serving":"to taste","qty":1,"nutr":{"kcal":12,"sodium":100,"protein":0.8,"sugar":0.5,"fiber":0.3,"fat":0,"satfat":0,"chol":0,"potassium":10}}
+      ]
+    },
+    {
+      "name": "Tuna Salad (apple & walnut)",
+      "emoji": "🐟",
+      "components": [
+        {"name":"Kirkland albacore tuna (1 can, drained & rinsed)","brand":"Kirkland (Costco)","serving":"1 can","qty":1,"nutr":{"kcal":210,"sodium":380,"protein":42,"sugar":0,"fiber":0,"fat":3,"satfat":0.5,"chol":70,"potassium":250}},
+        {"name":"Nonfat Greek yogurt (1/4 cup)","brand":"","serving":"1/4 cup","qty":1,"nutr":{"kcal":33,"sodium":22,"protein":5.5,"sugar":1.5,"fiber":0,"fat":0,"satfat":0,"chol":2,"potassium":55}},
+        {"name":"Avocado-oil mayo (1/2 Tbsp)","brand":"","serving":"1/2 Tbsp","qty":1,"nutr":{"kcal":50,"sodium":45,"protein":0,"sugar":0,"fiber":0,"fat":5.5,"satfat":0.75,"chol":2,"potassium":0}},
+        {"name":"Celery, diced (1 stalk)","brand":"HEB","serving":"1 stalk","qty":1,"nutr":{"kcal":6,"sodium":32,"protein":0.3,"sugar":0.7,"fiber":0.4,"fat":0,"satfat":0,"chol":0,"potassium":104}},
+        {"name":"Walnuts, chopped (1 Tbsp)","brand":"Kirkland (Costco)","serving":"1 Tbsp","qty":1,"nutr":{"kcal":52,"sodium":1,"protein":1,"sugar":0.2,"fiber":0.5,"fat":5.2,"satfat":0.3,"chol":0,"potassium":33}},
+        {"name":"Granny Smith apple, chopped (1/2 small)","brand":"HEB","serving":"1/2 small","qty":1,"nutr":{"kcal":30,"sodium":0,"protein":0.1,"sugar":5.5,"fiber":1.4,"fat":0,"satfat":0,"chol":0,"potassium":60}},
+        {"name":"Dijon + black pepper + lemon (seasoning)","brand":"","serving":"to taste","qty":1,"nutr":{"kcal":5,"sodium":70,"protein":0.2,"sugar":0,"fiber":0,"fat":0,"satfat":0,"chol":0,"potassium":0}}
       ]
     }
   ]
