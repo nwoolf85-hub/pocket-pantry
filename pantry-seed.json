@@ -139,7 +139,9 @@
 
     {"name":"Kirkland Three Berry Blend (frozen)","brand":"Kirkland (Costco)","serving":"1 cup (126g)","verified":true,"src":"label","code":"0096619174027","nutr":{"kcal":70,"sodium":0,"protein":2,"sugar":10,"fiber":5,"fat":0,"satfat":0,"chol":0,"potassium":210}},
     {"name":"Frozen fajita peppers","brand":"Costco","serving":"1 cup (85g)","nutr":{"kcal":25,"sodium":5,"protein":1,"sugar":3,"fiber":1.5,"fat":0.2,"satfat":0,"chol":0,"potassium":180}},
-    {"name":"Barely breaded spicy chicken tenders","brand":"Costco","serving":"3 oz (84g)","nutr":{"kcal":200,"sodium":480,"protein":16,"sugar":1,"fiber":1,"fat":11,"satfat":2,"chol":45,"potassium":200}},
+    {"name":"Just Bare Lightly Breaded Spicy Chicken Strips","brand":"Just Bare (Costco)","serving":"2 pieces (93g)","verified":true,"src":"label","code":"0077013615606","nutr":{"kcal":170,"sodium":620,"protein":15.8,"sugar":1.9,"fiber":0,"fat":6,"satfat":1,"chol":45,"potassium":360}},
+    {"name":"Kinder's Buttery Buffalo Wing Sauce","brand":"Kinder's","serving":"1 Tbsp (16g)","verified":true,"src":"label","code":"0755795655194","nutr":{"kcal":25,"sodium":380,"protein":0,"sugar":1,"fiber":0,"fat":2,"satfat":0,"chol":0,"potassium":0}},
+    {"name":"Avocado oil","brand":"","serving":"1 Tbsp (14g)","verified":true,"src":"label","code":null,"nutr":{"kcal":124,"sodium":0,"protein":0,"sugar":0,"fiber":0,"fat":14,"satfat":1.6,"chol":0,"potassium":0}},
     {"name":"Tallow fries","brand":"Costco","serving":"3 oz (84g)","nutr":{"kcal":170,"sodium":230,"protein":2,"sugar":0,"fiber":2,"fat":8,"satfat":3,"chol":0,"potassium":350}},
     {"name":"Organic cauliflower stir fry","brand":"Costco","serving":"1 cup (120g)","nutr":{"kcal":60,"sodium":300,"protein":3,"sugar":4,"fiber":3,"fat":2,"satfat":0.3,"chol":0,"potassium":250}},
 
@@ -161,6 +163,18 @@
         {"name":"Premium Gold Organic Golden Flax Seed","brand":"Premium Gold (Costco)","serving":"2 Tbsp (13g)","qty":0.5,"nutr":{"kcal":70,"sodium":0,"protein":3,"sugar":0,"fiber":4,"fat":5,"satfat":0.5,"chol":0,"potassium":106}},
         {"name":"Central Market Organic Milled Chia Seeds","brand":"Central Market (HEB)","serving":"1 Tbsp (12g)","qty":1,"nutr":{"kcal":58,"sodium":2,"protein":2,"sugar":0,"fiber":4.1,"fat":3.7,"satfat":0.4,"chol":0,"potassium":49}},
         {"name":"Kirkland Organic Hemp Hearts","brand":"Kirkland (Costco)","serving":"3 Tbsp (30g)","qty":0.333,"nutr":{"kcal":180,"sodium":0,"protein":10,"sugar":0,"fiber":1,"fat":16,"satfat":1.5,"chol":0,"potassium":350}}
+      ]
+    },
+    {
+      "name": "Spicy Chicken & Air-Fried Cauliflower",
+      "emoji": "🍗",
+      "components": [
+        {"name":"Just Bare Lightly Breaded Spicy Chicken Strips","brand":"Just Bare (Costco)","serving":"2 pieces (93g)","qty":1,"nutr":{"kcal":170,"sodium":620,"protein":15.8,"sugar":1.9,"fiber":0,"fat":6,"satfat":1,"chol":45,"potassium":360}},
+        {"name":"Cauliflower","brand":"HEB","serving":"1 cup (107g)","qty":2,"nutr":{"kcal":27,"sodium":32,"protein":2,"sugar":2,"fiber":2.1,"fat":0.3,"satfat":0,"chol":0,"potassium":320}},
+        {"name":"Avocado oil (air-fry)","brand":"","serving":"1 Tbsp (14g)","qty":1,"nutr":{"kcal":124,"sodium":0,"protein":0,"sugar":0,"fiber":0,"fat":14,"satfat":1.6,"chol":0,"potassium":0}},
+        {"name":"Salt + spices (seasoning)","brand":"","serving":"to taste","qty":1,"nutr":{"kcal":0,"sodium":150,"protein":0,"sugar":0,"fiber":0,"fat":0,"satfat":0,"chol":0,"potassium":0}},
+        {"name":"Blue cheese dressing (HEB)","brand":"Hill Country Fare","serving":"2 Tbsp (30g)","qty":1,"nutr":{"kcal":145,"sodium":320,"protein":1,"sugar":1,"fiber":0,"fat":15,"satfat":3,"chol":10,"potassium":30}},
+        {"name":"Kinder's Buttery Buffalo Wing Sauce","brand":"Kinder's","serving":"1 Tbsp (16g)","qty":1,"nutr":{"kcal":25,"sodium":380,"protein":0,"sugar":1,"fiber":0,"fat":2,"satfat":0,"chol":0,"potassium":0}}
       ]
     }
   ]
