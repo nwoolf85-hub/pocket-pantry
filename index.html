@@ -1,0 +1,104 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0e1626">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Diet Dash">
+<title>Diet Dash</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="styles.css">
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">Diet&nbsp;Dash</div>
+    <div id="dayNav" class="daynav">
+      <button id="prevDay" aria-label="Previous day">‹</button>
+      <button id="dayLabel" class="daylabel">Today</button>
+      <button id="nextDay" aria-label="Next day">›</button>
+    </div>
+  </header>
+
+  <main id="views">
+    <!-- TODAY -->
+    <section id="view-today" class="view active">
+      <div id="windowStrip" class="windowstrip"></div>
+      <div id="ringsGrid" class="rings"></div>
+      <div class="section-title">
+        <span>Logged</span>
+        <button id="addFromToday" class="chip-btn">+ Add food</button>
+      </div>
+      <ul id="logList" class="loglist"></ul>
+    </section>
+
+    <!-- WEEK -->
+    <section id="view-week" class="view">
+      <div class="section-title"><span>This week</span></div>
+      <div id="weekTable" class="weektable"></div>
+      <div class="section-title"><span>Daily averages vs target</span></div>
+      <div id="weekAvg" class="rings"></div>
+    </section>
+
+    <!-- PANTRY -->
+    <section id="view-pantry" class="view">
+      <div id="pantryBanner"></div>
+      <div class="searchrow">
+        <input id="pantrySearch" type="search" placeholder="Search your pantry…" autocomplete="off">
+        <button id="newFoodBtn" class="chip-btn">+ New</button>
+      </div>
+      <ul id="pantryList" class="pantrylist"></ul>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view">
+      <div class="section-title"><span>Daily targets</span></div>
+      <div id="targetForm" class="targetform"></div>
+      <div class="section-title"><span>Eating window</span></div>
+      <div class="windowform">
+        <label>Start hour
+          <select id="winStart"></select>
+        </label>
+        <label>Length (hrs)
+          <input id="winLen" type="number" min="1" max="24" step="1">
+        </label>
+      </div>
+      <p class="note" id="medNote"></p>
+      <div class="section-title"><span>Starter pantry</span></div>
+      <button id="loadSeedBtn" class="ghost-btn" style="width:100%">Load HEB / Costco starter pantry</button>
+      <p class="note">Adds a deduped set of your usual groceries with per-serving nutrition. Every item is <b>unverified</b> — the first time you log one, check it against the real label, then it's saved verified. Safe to tap again; it skips foods you already have.</p>
+      <button id="reconcileBtn" class="ghost-btn" style="width:100%;margin-top:6px">Match to real products (“Did you mean?”)</button>
+      <p class="note">Cross-references each estimate against real H-E-B / Kirkland SKUs in the USDA branded database and lets you pick the exact one — adopting its label numbers and marking it verified. Needs your own USDA key (below) for the full run.</p>
+      <div class="section-title"><span>Food search</span></div>
+      <div id="usdaKeyField" class="windowform" style="grid-template-columns:1fr"></div>
+      <p class="note">Name search uses the USDA FoodData Central database. The shared demo key works for light use but is rate-limited — get your own free key in a minute at <b style="color:var(--gold)">fdc.nal.usda.gov/api-key-signup</b> and paste it above. Barcode lookups use Open Food Facts and need no key.</p>
+      <div class="section-title"><span>Data</span></div>
+      <div class="datarow">
+        <button id="exportBtn" class="ghost-btn">Export JSON</button>
+        <button id="importBtn" class="ghost-btn">Import JSON</button>
+        <input id="importFile" type="file" accept="application/json" hidden>
+      </div>
+      <p class="note">Everything is stored on this device only. Nothing is sent anywhere except the food-search lookups you trigger.</p>
+      <p class="note" id="version"></p>
+    </section>
+  </main>
+
+  <nav class="tabbar">
+    <button class="tab active" data-view="today"><span>◎</span>Today</button>
+    <button class="tab" data-view="week"><span>▦</span>Week</button>
+    <button class="tab" data-view="pantry"><span>☰</span>Pantry</button>
+    <button class="tab" data-view="settings"><span>⚙</span>Settings</button>
+  </nav>
+</div>
+
+<!-- ADD / LOG SHEET -->
+<div id="sheet" class="sheet-wrap" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
