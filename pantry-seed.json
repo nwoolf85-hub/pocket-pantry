@@ -200,6 +200,15 @@
         {"name":"Kirkland Ultra-Filtered 2% Milk","brand":"Kirkland (Costco)","serving":"8 oz (240ml)","qty":1,"nutr":{"kcal":120,"sodium":110,"protein":13,"sugar":6,"fiber":0,"fat":4.5,"satfat":3,"chol":20,"potassium":370}},
         {"name":"Filtered water","brand":"","serving":"4 oz","qty":1,"nutr":{"kcal":0,"sodium":0,"protein":0,"sugar":0,"fiber":0,"fat":0,"satfat":0,"chol":0,"potassium":0}}
       ]
+    },
+    {
+      "name": "Hard-Boiled Eggs & Cheese",
+      "emoji": "🥚",
+      "components": [
+        {"name":"Eggs","brand":"Costco","serving":"1 large (50g)","qty":2,"nutr":{"kcal":72,"sodium":71,"protein":6.3,"sugar":0.4,"fiber":0,"fat":4.8,"satfat":1.6,"chol":186,"potassium":69}},
+        {"name":"Cheddar cheese","brand":"Costco","serving":"1 oz (28g)","qty":0.5,"nutr":{"kcal":114,"sodium":180,"protein":7,"sugar":0.1,"fiber":0,"fat":9.4,"satfat":6,"chol":30,"potassium":28}},
+        {"name":"Salt + pepper (seasoning)","brand":"","serving":"to taste","qty":1,"nutr":{"kcal":0,"sodium":120,"protein":0,"sugar":0,"fiber":0,"fat":0,"satfat":0,"chol":0,"potassium":0}}
+      ]
     }
   ]
 }
