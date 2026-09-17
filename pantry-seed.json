@@ -171,10 +171,11 @@
       "components": [
         {"name":"Just Bare Lightly Breaded Spicy Chicken Strips","brand":"Just Bare (Costco)","serving":"2 pieces (93g)","qty":1,"nutr":{"kcal":170,"sodium":620,"protein":15.8,"sugar":1.9,"fiber":0,"fat":6,"satfat":1,"chol":45,"potassium":360}},
         {"name":"Cauliflower","brand":"HEB","serving":"1 cup (107g)","qty":2,"nutr":{"kcal":27,"sodium":32,"protein":2,"sugar":2,"fiber":2.1,"fat":0.3,"satfat":0,"chol":0,"potassium":320}},
+        {"name":"Side salad (mixed greens)","brand":"","serving":"2 cups","qty":1,"nutr":{"kcal":16,"sodium":15,"protein":1.5,"sugar":1,"fiber":2,"fat":0,"satfat":0,"chol":0,"potassium":250}},
         {"name":"Avocado oil (air-fry)","brand":"","serving":"1 Tbsp (14g)","qty":1,"nutr":{"kcal":124,"sodium":0,"protein":0,"sugar":0,"fiber":0,"fat":14,"satfat":1.6,"chol":0,"potassium":0}},
         {"name":"Salt + spices (seasoning)","brand":"","serving":"to taste","qty":1,"nutr":{"kcal":0,"sodium":150,"protein":0,"sugar":0,"fiber":0,"fat":0,"satfat":0,"chol":0,"potassium":0}},
-        {"name":"Blue cheese dressing (HEB)","brand":"Hill Country Fare","serving":"2 Tbsp (30g)","qty":1,"nutr":{"kcal":145,"sodium":320,"protein":1,"sugar":1,"fiber":0,"fat":15,"satfat":3,"chol":10,"potassium":30}},
-        {"name":"Kinder's Buttery Buffalo Wing Sauce","brand":"Kinder's","serving":"1 Tbsp (16g)","qty":1,"nutr":{"kcal":25,"sodium":380,"protein":0,"sugar":1,"fiber":0,"fat":2,"satfat":0,"chol":0,"potassium":0}}
+        {"name":"Blue cheese dressing (HEB, light — dip + salad)","brand":"Hill Country Fare","serving":"2 Tbsp (30g)","qty":0.75,"nutr":{"kcal":145,"sodium":320,"protein":1,"sugar":1,"fiber":0,"fat":15,"satfat":3,"chol":10,"potassium":30}},
+        {"name":"Kinder's Buttery Buffalo Wing Sauce","brand":"Kinder's","serving":"1 Tbsp (16g)","qty":0.333,"nutr":{"kcal":25,"sodium":380,"protein":0,"sugar":1,"fiber":0,"fat":2,"satfat":0,"chol":0,"potassium":0}}
       ]
     }
   ]
